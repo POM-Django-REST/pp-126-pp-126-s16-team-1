@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+</head>
+<body>
+    <h1>Register</h1>
+    <form action="" method="post">
+        {% csrf_token %}
+        <label>Email: </label><br>
+        <input type="email" name="email" required><br>
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br>
+        <label>First Name:</label><br>
+        <input type="text" name="first_name" required><br>
+        <label>Middle Name:</label><br>
+        <input type="text" name="middle_name"><br>
+        <label>Last Name:</label><br>
+        <input type="text" name="last_name" required><br>
+        <label>Role:</label><br>
+        <select name="role">
+            <option value="visitor">Guest</option>
+            <option value="librarian">Librarian</option>
+        </select><br><br>
+        <input type="submit" value="Register">
+    </form>
+    <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+</body>
+</html>

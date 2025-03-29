@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User details</title>
+</head>
+<body>
+    <h1>User details</h1>
+    <p>ID: {{ user.id }}</p>
+    <p>Name: {{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}</p>
+    <p>Email: {{ user.email }}</p>
+    <p>Role: {% if user.role == 1 %}Librarian{% else %}Guest{% endif %}</p>
+    <p>Created At: {{ user.created_at }}</p>
+    <p>Updated At: {{ user.updated_at }}</p>
+    <p><a href="{% url 'users_list' %}">Back to Users List</a></p>
+</body>
+</html>
