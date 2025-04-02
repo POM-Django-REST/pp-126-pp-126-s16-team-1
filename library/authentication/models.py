@@ -75,6 +75,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     password = models.CharField(default=None, max_length=255)
     created_at = models.DateTimeField(editable=False, auto_now=datetime.datetime.now())
     updated_at = models.DateTimeField(auto_now=datetime.datetime.now())
+
     role = models.IntegerField(choices=ROLE_CHOICES, default=0)
     is_active = models.BooleanField(default=False)
     id = models.AutoField(primary_key=True)
