@@ -1,6 +1,8 @@
 from django.db import models, DataError
 
-from authentication.models import CustomUser
+from django.contrib.auth import get_user_model
+CustomUser = get_user_model()
+
 from book.models import Book
 
 
