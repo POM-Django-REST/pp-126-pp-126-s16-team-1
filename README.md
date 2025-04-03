@@ -1,7 +1,7 @@
-<<<<<<< HEAD
+
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/BbxpX_Lv)
 Сopy the project from the previous sprint.
->>>>>>> fd7ef04 (add deadline)
+
 
 Select a project (one of the team members) from the previous sprint and copy the project.
 
