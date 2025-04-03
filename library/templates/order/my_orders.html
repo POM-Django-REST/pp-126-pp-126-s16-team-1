@@ -8,6 +8,7 @@
             Plated end: {{ order.plated_end_at|date:"Y-m-d" }} —
             {% if not order.end_at %}
                 <strong>Not returned</strong>
+                <a href="{% url 'update_order' order.id %}"><button>Edit</button></a>
             {% else %}
                 Returned: {{ order.end_at|date:"Y-m-d" }}
             {% endif %}

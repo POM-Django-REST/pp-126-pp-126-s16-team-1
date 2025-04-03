@@ -1,7 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as auth_login
+
 from django.http import HttpResponse
-from authentication.models import CustomUser
 from django.urls import reverse
+from authentication.models import CustomUser
+from authentication.forms import UserRegistrationForm, UserLoginForm, UserUpdateForm
 
 def get_current_user(request):
     user_id = request.session.get('user_id')
@@ -13,70 +17,59 @@ def get_current_user(request):
     return None
 
 def register(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        middle_name = request.POST.get('middle_name')
-        role = request.POST.get('role')  # expected value: 'librarian' or 'visitor'
-        # Map role string to integer (librarian=1, visitor=0)
-        role_int = 1 if role == 'librarian' else 0
-        
-        # Check if the email is already registered.
-        if CustomUser.objects.filter(email=email).exists():
-            return HttpResponse("Email already registered.")
-        # Create a new user using the manager so that the password is hashed.
-        CustomUser.objects.create_user(email=email, password=password,
-                                       first_name=first_name,
-                                       last_name=last_name,
-                                       middle_name=middle_name,
-                                       role=role_int,
-                                       is_active=True)
-        return redirect(reverse('login'))
-    return render(request, 'authentication/register.html')
+    if request.method == "POST":
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            first_name = form.cleaned_data["first_name"]
+            last_name = form.cleaned_data["last_name"]
+            middle_name = form.cleaned_data["middle_name"]
+            email = form.cleaned_data["email"]
+            password = form.cleaned_data["password"]
+            role = form.cleaned_data["role"]
+
+            if CustomUser.get_by_email(email):
+                return render(request, "authentication/register.html", {"form": form, "error": "Email вже використовується"})
+            user = CustomUser.create(
+                email=email, 
+                password=password, 
+                first_name=first_name, 
+                middle_name=middle_name, 
+                last_name=last_name)
+
+            user.role = role
+            user.is_active = True
+            user.save()
+            return redirect("login")
+
+    else:
+        form = UserRegistrationForm()
+
+    return render(request, "authentication/register.html", {"form": form})
 
 def login(request):
     if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        middle_name = request.POST.get('middle_name')
-        role = request.POST.get('role')
-        role_int = 1 if role == 'librarian' else 0
-
-        if CustomUser.objects.filter(email=email).exists():
-            return HttpResponse('Email already registered')
-        CustomUser.objects.create_user(email=email, password=password,
-                                       first_name=first_name,
-                                       last_name=last_name,
-                                       middle_name=middle_name,
-                                       role=role_int,
-                                       is_active=True)
-        return redirect(reverse('login'))
-    return render(request, 'authentication/register.html')
-
-def login(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        try:
-            user = CustomUser.objects.get(email=email)
-            if user.check_password(password):
-                request.session['user_id'] = user.id
-                return redirect(reverse('users_list'))
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            user = authenticate(request, email=email, password=password)
+            
+            if user is not None:
+                if user.role == 0 or user.role == 1:
+                    auth_login(request, user)
+                    return redirect('users_list')
+                else:
+                    form.add_error(None, "User role not allowed.")
+                    return render(request, "authentication/login.html", {"form": form})
             else:
-                return HttpResponse("Invalid credentials.")
-        except CustomUser.DoesNotExist:
-            return HttpResponse("User does not exist.")
-    return render(request, 'authentication/login.html')
+                form.add_error(None, "Invalid email or password.")
+    else:
+        form = UserLoginForm()
+    
+    return render(request, 'authentication/login.html', {'form': form})
 
 def logout(request):
-    try:
-        del request.session['user_id']
-    except KeyError:
-        pass
+    request.session.flush()
     return redirect(reverse('login'))
 
 def users_list(request):
@@ -90,5 +83,19 @@ def user_details(request, user_id):
     current_user = get_current_user(request)
     if not current_user or current_user.role != 1:
         return HttpResponse("Access denied. Librarians only.")
+
     user = get_object_or_404(CustomUser, id=user_id)
-    return render(request, 'authentication/user_details.html', {'user': user})
+
+    if request.method == "POST":
+        if "delete" in request.POST:
+            user.delete()
+            return redirect(reverse('users_list'))
+        else:
+            form = UserUpdateForm(request.POST, instance=user)
+            if form.is_valid():
+                form.save()
+                return redirect(reverse('users_list'))
+    else:
+        form = UserUpdateForm(instance=user)
+
+    return render(request, 'authentication/user_details.html', {'form': form, 'user': user})

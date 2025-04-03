@@ -2,10 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Users ist</title>
+    <title>User list</title>
 </head>
 <body>
     <h1>Users</h1>
+    {% if request.user.is_authenticated %}
+        <p>Ви увійшли як {{ request.user.email }}</p>
+    {% else %}
+        <p>Ви не увійшли</p>
+    {% endif %}
     <ul>
         {% for user in users %}
             <li>

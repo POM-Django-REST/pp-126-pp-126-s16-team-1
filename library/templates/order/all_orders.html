@@ -11,6 +11,7 @@
                     {% csrf_token %}
                     <button type="submit">Close</button>
                 </form>
+                <a href="{% url 'update_order' order.id %}"><button>Edit</button></a>
             {% else %}
                 Returned: {{ order.end_at|date:"Y-m-d" }}
             {% endif %}
