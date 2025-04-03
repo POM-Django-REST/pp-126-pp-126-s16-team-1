@@ -18,7 +18,6 @@ class Author(models.Model):
     name = models.CharField(blank=True, max_length=20)
     surname = models.CharField(blank=True, max_length=20)
     patronymic = models.CharField(blank=True, max_length=20)
-    books = models.ManyToManyField(book.models.Book, related_name='authors')
     id = models.AutoField(primary_key=True)
 
     def __str__(self):

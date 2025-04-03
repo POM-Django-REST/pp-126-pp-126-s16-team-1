@@ -10,7 +10,4 @@ class AuthorAdmin(admin.ModelAdmin):
         ('Basic Information', {
             'fields': ('name', 'surname', 'patronymic')
         }),
-        ('Books', {
-            'fields': ('books',)
-        }),
     )

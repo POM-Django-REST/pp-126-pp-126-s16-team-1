@@ -1,8 +1,7 @@
 from django.urls import path
-from author import views
+from .views import AuthorCreateView, AuthorUpdateView
 
 urlpatterns = [
-    path('', views.authors_list, name='authors_list'),
-    path('create/', views.author_create, name='author_create'),
-    path('delete/<int:author_id>/', views.author_delete, name='author_delete'),
+    path('authors/add/', AuthorCreateView.as_view(), name='author_add'),
+    path('authors/<int:pk>/edit/', AuthorUpdateView.as_view(), name='author_edit'),
 ]
