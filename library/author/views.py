@@ -4,6 +4,8 @@ from .models import Author
 from .forms import AuthorForm
 from authentication.views import get_current_user
 from django.http import HttpResponse
+from rest_framework import viewsets
+from .serializers import AuthorSerializer
 
 class AuthorAccessMixin:
     def dispatch(self, request, *args, **kwargs):
@@ -23,3 +25,7 @@ class AuthorUpdateView(AuthorAccessMixin, UpdateView):
     form_class = AuthorForm
     template_name = 'author_form.html'
     success_url = reverse_lazy('authors_list')
+    
+class AuthorViewSet(viewsets.ModelViewSet):
+    queryset = Author.objects.all()
+    serializer_class = AuthorSerializer
